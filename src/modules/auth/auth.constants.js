@@ -1,0 +1,11 @@
+const SIGNUP_ALLOWED_FIELDS = ['firstName', 'lastName', 'emailId', 'password'];
+
+const SIGNUP_RESPONSE_FIELDS = [
+  '_id',
+  'firstName',
+  'lastName',
+  'emailId',
+  'tenantId',
+];
+
+export { SIGNUP_ALLOWED_FIELDS, SIGNUP_RESPONSE_FIELDS };
