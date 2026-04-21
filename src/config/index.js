@@ -46,6 +46,18 @@ class Config {
   get jwt() {
     return {
       secret: process.env.JWT_SECRET || 'your-super-secret-key-change-this',
+      expiresIn: process.env.JWT_EXPIRES_IN || '1h',
+      issuer: process.env.JWT_ISSUER || 'nexflow',
+    };
+  }
+
+  get cookies() {
+    return {
+      jwt_token_name: process.env.COOKIE_JWT_TOKEN_NAME || 'nexflow_token',
+      secure: process.env.COOKIE_SECURE === 'true',
+      httpOnly: process.env.COOKIE_HTTP_ONLY === 'true',
+      sameSite: process.env.COOKIE_SAME_SITE || 'lax',
+      expiresIn: parseInt(process.env.COOKIE_EXPIRES_IN, 10) || 360000, // in milliseconds
     };
   }
 }

@@ -10,6 +10,7 @@ const tenantSchema = new mongoose.Schema(
     description: {
       type: String,
       maxLength: 250,
+      default: '',
     },
   },
   { timestamps: true }

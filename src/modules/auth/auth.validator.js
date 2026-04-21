@@ -16,10 +16,23 @@ const signUpUserSchema = z.object({
     .email({ error: 'Invalid email address' })
     .trim()
     .lowercase()
-    .max(150, { error: 'Email must be at most 150 characters long' }),
+    .max(100, { error: 'Email must be at most 100 characters long' }),
   password: z
     .string({ error: 'Password is required' })
     .min(8, { error: 'Password must be at least 8 characters long' })
     .max(15, { error: 'Password must be at most 15 characters long' }),
 });
-export { signUpUserSchema };
+
+const loginUserSchema = z.object({
+  emailId: z
+    .email({ error: 'Invalid email address' })
+    .trim()
+    .lowercase()
+    .max(100, { error: 'Email must be at most 100 characters long' }),
+  password: z
+    .string({ error: 'Password is required' })
+    .min(8, { error: 'Password must be at least 8 characters long' })
+    .max(15, { error: 'Password must be at most 15 characters long' }),
+});
+
+export { signUpUserSchema, loginUserSchema };

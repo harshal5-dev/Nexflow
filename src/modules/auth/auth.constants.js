@@ -8,4 +8,19 @@ const SIGNUP_RESPONSE_FIELDS = [
   'tenantId',
 ];
 
-export { SIGNUP_ALLOWED_FIELDS, SIGNUP_RESPONSE_FIELDS };
+const LOGIN_ALLOWED_FIELDS = ['emailId', 'password'];
+
+const AUTH_USER_FIELDS = [
+  '_id',
+  'firstName',
+  'lastName',
+  'emailId',
+  'tenantId',
+];
+
+export {
+  SIGNUP_ALLOWED_FIELDS,
+  SIGNUP_RESPONSE_FIELDS,
+  LOGIN_ALLOWED_FIELDS,
+  AUTH_USER_FIELDS,
+};
