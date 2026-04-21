@@ -6,12 +6,27 @@ const roleSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      maxLength: 50,
+      maxLength: 100,
     },
     description: {
       type: String,
       maxLength: 250,
       default: '',
+    },
+    code: {
+      type: String,
+      required: true,
+      unique: true,
+      maxLength: 100,
+    },
+    scope: {
+      type: String,
+      enum: ['TENANT', 'PLATFORM'],
+      default: 'TENANT',
+    },
+    tenantId: {
+      type: mongoose.Schema.Types.ObjectId,
+      index: true,
     },
   },
   { timestamps: true }

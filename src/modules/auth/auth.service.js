@@ -10,6 +10,7 @@ import { filterResponseBody } from '../../common/utils.js';
 import { SIGNUP_RESPONSE_FIELDS } from './auth.constants.js';
 import AppError from '../../common/AppError.js';
 import { STATUS_CODES } from '../../common/constants.js';
+import { getDefaultRole } from '../role/role.service.js';
 
 const signup = async userPayload => {
   const session = await mongoose.startSession();
@@ -18,10 +19,12 @@ const signup = async userPayload => {
     const transactionResults = await session.withTransaction(async () => {
       const tenantName = `${userPayload.firstName}-organization`;
       const createdTenant = await createTenant(session, { name: tenantName });
+      const defaultRole = await getDefaultRole(session);
 
       const createdUser = await createUser(session, {
         ...userPayload,
         tenantId: createdTenant._id,
+        roleIds: [defaultRole._id],
       });
       return { tenantId: createdTenant._id, ...createdUser };
     });

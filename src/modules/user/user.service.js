@@ -10,6 +10,7 @@ import {
   USER_TENANT_FIELDS,
 } from './user.constants.js';
 import { filterResponseBody } from '../../common/utils.js';
+import { getTenantById } from '../tenant/tenant.service.js';
 
 const createUser = async (session, userData) => {
   try {
@@ -45,14 +46,13 @@ const getUserProfile = async userId => {
   try {
     const user = await userModel
       .findById(userId)
-      .populate('tenantId', USER_TENANT_FIELDS)
       .populate('roleIds', USER_ROLE_FIELDS);
     if (!user) {
       throw new AppError('User not found', STATUS_CODES.NOT_FOUND);
     }
 
     const userObj = user.toObject();
-    userObj.tenant = userObj.tenantId;
+    userObj.tenant = await getTenantById(userObj.tenantId, USER_TENANT_FIELDS);
     userObj.roles = userObj.roleIds;
 
     return filterResponseBody(userObj, USER_RESPONSE_FIELDS);
