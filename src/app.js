@@ -1,13 +1,18 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 import { connectDB } from './config/database.js';
 import config from './config/index.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import errorHandlerMiddleware from './middlewares/errorHandler.middleware.js';
 import verifyJwtToken from './middlewares/verifyJwtToken.middleware.js';
+import corsConfig from './config/cors.js';
 
 const app = express();
+
+app.use(cors(corsConfig));
+app.options(/.*/, cors(corsConfig)); // Express 5-safe preflight handler for all routes
 
 app.use(express.json({ limit: '5mb' }));
 app.use(cookieParser());

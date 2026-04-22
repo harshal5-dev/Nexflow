@@ -19,6 +19,11 @@ class Config {
     }
   }
 
+  splitCommaSeparatedEnvVar(varName, defaultValue = []) {
+    const value = process.env[varName];
+    return value ? value.split(',').map(item => item.trim()) : defaultValue;
+  }
+
   get env() {
     return process.env.NODE_ENV || 'development';
   }
@@ -58,6 +63,27 @@ class Config {
       httpOnly: process.env.COOKIE_HTTP_ONLY === 'true',
       sameSite: process.env.COOKIE_SAME_SITE || 'lax',
       expiresIn: parseInt(process.env.COOKIE_EXPIRES_IN, 10) || 360000, // in milliseconds
+    };
+  }
+
+  get cors() {
+    return {
+      origin: this.splitCommaSeparatedEnvVar('CORS_ORIGIN', [
+        'http://localhost:5173',
+      ]),
+      methods: this.splitCommaSeparatedEnvVar('CORS_METHODS', [
+        'GET',
+        'POST',
+        'PUT',
+        'DELETE',
+        'OPTIONS',
+      ]),
+      allowedHeaders: this.splitCommaSeparatedEnvVar('CORS_ALLOWED_HEADERS', [
+        'Content-Type',
+        'Authorization',
+      ]),
+      credentials: process.env.CORS_CREDENTIALS === 'true',
+      maxAge: parseInt(process.env.CORS_MAX_AGE, 10) || 3600,
     };
   }
 }

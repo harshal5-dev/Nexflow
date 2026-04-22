@@ -8,7 +8,7 @@ import { getUserById } from '../modules/user/user.service.js';
 import { filterResponseBody } from '../common/utils.js';
 import { AUTH_USER_FIELDS } from '../modules/auth/auth.constants.js';
 
-const EXCLUDED_PATHS = ['/api/v1/auth/login', '/api/v1/auth/signup'];
+const EXCLUDED_PATHS = new Set(['/api/v1/auth/login', '/api/v1/auth/signup']);
 
 const extractSubjectFromToken = sub => {
   try {
@@ -26,7 +26,7 @@ const extractSubjectFromToken = sub => {
 };
 
 const verifyJwtToken = async (req, res, next) => {
-  if (EXCLUDED_PATHS.includes(req.originalUrl)) {
+  if (req.method === 'OPTIONS' || EXCLUDED_PATHS.has(req.path)) {
     return next();
   }
 
