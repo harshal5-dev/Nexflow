@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { getCurrentUserProfile, login, signup } from './auth.service.js';
+import { getCurrentUserProfile, signin, signup } from './auth.service.js';
 import { validateLoginUser, validateSignUpUser } from './auth.middleware.js';
 import { sendSuccessResponse } from '../../common/api.response.js';
 import { STATUS_CODES } from '../../common/constants.js';
@@ -28,9 +28,9 @@ router.post('/signup', validateSignUpUser, async (req, res) => {
   }
 });
 
-router.post('/login', validateLoginUser, async (req, res) => {
+router.post('/signin', validateLoginUser, async (req, res) => {
   try {
-    const { token, user } = await login(req.body);
+    const { token, user } = await signin(req.body);
 
     res.cookie(config.cookies.jwt_token_name, token, {
       secure: config.cookies.secure,
@@ -41,12 +41,27 @@ router.post('/login', validateLoginUser, async (req, res) => {
 
     return sendSuccessResponse(res, {
       statusCode: STATUS_CODES.OK,
-      message: 'User logged in successfully',
+      message: 'User signed in successfully',
       data: { ...user },
+      path: req.originalUrl,
     });
   } catch (error) {
     throw error;
   }
+});
+
+router.get('/is-authenticated', (req, res) => {
+  const isAuthenticated = !!req.user;
+  const message = isAuthenticated
+    ? 'User is authenticated'
+    : 'User is not authenticated';
+
+  return sendSuccessResponse(res, {
+    statusCode: STATUS_CODES.OK,
+    message,
+    data: isAuthenticated,
+    path: req.originalUrl,
+  });
 });
 
 router.get('/me', async (req, res) => {

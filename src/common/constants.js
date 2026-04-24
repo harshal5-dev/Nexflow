@@ -8,4 +8,9 @@ const STATUS_CODES = {
   INTERNAL_SERVER_ERROR: 500,
 };
 
-export { STATUS_CODES };
+const AUTH_EXCLUDED_PATHS = new Set([
+  '/api/v1/auth/signin',
+  '/api/v1/auth/signup',
+]);
+
+export { STATUS_CODES, AUTH_EXCLUDED_PATHS };

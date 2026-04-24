@@ -37,7 +37,7 @@ const signup = async userPayload => {
   }
 };
 
-const login = async credentials => {
+const signin = async credentials => {
   try {
     const { emailId, password } = credentials;
     const user = await getUserByEmail(credentials.emailId);
@@ -72,4 +72,4 @@ const getCurrentUserProfile = async userId => {
   }
 };
 
-export { signup, login, getCurrentUserProfile };
+export { signup, signin, getCurrentUserProfile };

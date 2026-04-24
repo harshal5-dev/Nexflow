@@ -1,14 +1,12 @@
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 
-import { STATUS_CODES } from '../common/constants.js';
+import { AUTH_EXCLUDED_PATHS, STATUS_CODES } from '../common/constants.js';
 import config from '../config/index.js';
 import AppError from '../common/AppError.js';
 import { getUserById } from '../modules/user/user.service.js';
 import { filterResponseBody } from '../common/utils.js';
 import { AUTH_USER_FIELDS } from '../modules/auth/auth.constants.js';
-
-const EXCLUDED_PATHS = new Set(['/api/v1/auth/login', '/api/v1/auth/signup']);
 
 const extractSubjectFromToken = sub => {
   try {
@@ -26,7 +24,7 @@ const extractSubjectFromToken = sub => {
 };
 
 const verifyJwtToken = async (req, res, next) => {
-  if (req.method === 'OPTIONS' || EXCLUDED_PATHS.has(req.path)) {
+  if (req.method === 'OPTIONS' || AUTH_EXCLUDED_PATHS.has(req.path)) {
     return next();
   }
 
