@@ -77,4 +77,19 @@ router.get('/me', async (req, res) => {
   });
 });
 
+router.post('/signout', (req, res) => {
+  res.clearCookie(config.cookies.jwt_token_name, {
+    secure: config.cookies.secure,
+    httpOnly: config.cookies.httpOnly,
+    sameSite: config.cookies.sameSite,
+  });
+
+  return sendSuccessResponse(res, {
+    statusCode: STATUS_CODES.OK,
+    message: 'User signed out successfully',
+    data: null,
+    path: req.originalUrl,
+  });
+});
+
 export default router;

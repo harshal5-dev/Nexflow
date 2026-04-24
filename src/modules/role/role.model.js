@@ -24,6 +24,12 @@ const roleSchema = new mongoose.Schema(
       enum: ['TENANT', 'PLATFORM'],
       default: 'TENANT',
     },
+    permissions: [
+      {
+        type: String,
+        default: [],
+      },
+    ],
     tenantId: {
       type: mongoose.Schema.Types.ObjectId,
       index: true,
