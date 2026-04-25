@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+import { sendEmail } from '../../common/mailer.js';
 import {
   createUser,
   getUserByEmail,
@@ -26,6 +27,9 @@ const signup = async userPayload => {
         tenantId: createdTenant._id,
         roleIds: [defaultRole._id],
       });
+
+      await sendWelcomeMail(userPayload);
+
       return { tenantId: createdTenant._id, ...createdUser };
     });
 
@@ -67,6 +71,30 @@ const getCurrentUserProfile = async userId => {
   try {
     const user = await getUserProfile(userId);
     return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const sendWelcomeMail = async userData => {
+  const email = userData.emailId;
+  const name = userData.firstName;
+  try {
+    await sendEmail({
+      to: email,
+      subject: 'Welcome to Nex Flow!',
+      template: 'welcome-email',
+      data: {
+        name,
+        currentYear: new Date().getFullYear(),
+        steps: [
+          { step: 1, text: 'Log in to your account' },
+          { step: 2, text: 'Create your first project' },
+          { step: 3, text: 'Invite your teammates' },
+          { step: 4, text: 'Start collaborating with your team' },
+        ],
+      },
+    });
   } catch (error) {
     throw error;
   }

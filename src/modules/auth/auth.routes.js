@@ -14,6 +14,7 @@ router.post('/signup', validateSignUpUser, async (req, res) => {
     const userData = req.body;
 
     const newUser = await signup(userData);
+
     return sendSuccessResponse(res, {
       statusCode: STATUS_CODES.CREATED,
       message: 'User signed up successfully',

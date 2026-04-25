@@ -86,6 +86,17 @@ class Config {
       maxAge: parseInt(process.env.CORS_MAX_AGE, 10) || 3600,
     };
   }
+
+  get brevo() {
+    return {
+      host: process.env.BREVO_HOST || 'smtp-relay.brevo.com',
+      port: parseInt(process.env.BREVO_PORT, 10) || 587,
+      user: process.env.BREVO_USER || 'your-brevo-user',
+      pass: process.env.BREVO_PASS || 'your-brevo-password',
+      fromEmail: process.env.FROM_EMAIL || 'your-from-email',
+      fromName: process.env.FROM_NAME || 'your-from-name',
+    };
+  }
 }
 
 export default new Config();
