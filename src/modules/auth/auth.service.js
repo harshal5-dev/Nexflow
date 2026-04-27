@@ -12,6 +12,7 @@ import { SIGNUP_RESPONSE_FIELDS } from './auth.constants.js';
 import AppError from '../../common/AppError.js';
 import { STATUS_CODES } from '../../common/constants.js';
 import { getDefaultRole } from '../role/role.service.js';
+import { tr } from 'zod/v4/locales';
 
 const signup = async userPayload => {
   const session = await mongoose.startSession();
@@ -95,6 +96,14 @@ const sendWelcomeMail = async userData => {
         ],
       },
     });
+  } catch (error) {
+    throw error;
+  }
+};
+
+const sendResetPasswordOTP = async emailId => {
+  try {
+    await createResetPassword(emailId);
   } catch (error) {
     throw error;
   }

@@ -1,7 +1,11 @@
 import express from 'express';
 
 import { getCurrentUserProfile, signin, signup } from './auth.service.js';
-import { validateLoginUser, validateSignUpUser } from './auth.middleware.js';
+import {
+  validateForgotPassword,
+  validateLoginUser,
+  validateSignUpUser,
+} from './auth.middleware.js';
 import { sendSuccessResponse } from '../../common/api.response.js';
 import { STATUS_CODES } from '../../common/constants.js';
 import AppError from '../../common/AppError.js';
@@ -63,6 +67,21 @@ router.get('/is-authenticated', (req, res) => {
     data: isAuthenticated,
     path: req.originalUrl,
   });
+});
+
+router.post('/forgot-password', validateForgotPassword, async (req, res) => {
+  try {
+    await sendResetPasswordOTP(req.body.emailId);
+
+    return sendSuccessResponse(res, {
+      statusCode: STATUS_CODES.OK,
+      message: 'Reset password OTP has been sent to the provided email.',
+      data: null,
+      path: req.originalUrl,
+    });
+  } catch (error) {
+    throw error;
+  }
 });
 
 router.get('/me', async (req, res) => {

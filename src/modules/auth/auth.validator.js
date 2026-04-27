@@ -35,4 +35,12 @@ const loginUserSchema = z.object({
     .max(15, { error: 'Password must be at most 15 characters long' }),
 });
 
-export { signUpUserSchema, loginUserSchema };
+const forgotPasswordSchema = z.object({
+  emailId: z
+    .email({ error: 'Invalid email address' })
+    .trim()
+    .lowercase()
+    .max(100, { error: 'Email must be at most 100 characters long' }),
+});
+
+export { signUpUserSchema, loginUserSchema, forgotPasswordSchema };

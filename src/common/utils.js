@@ -1,3 +1,4 @@
+import { randomInt } from 'crypto';
 import { flattenError } from 'zod';
 
 const filterRequestBody = (body, allowedFields) => {
@@ -28,4 +29,13 @@ const flattenValidationErrors = error => {
   return formattedErrors;
 };
 
-export { filterRequestBody, filterResponseBody, flattenValidationErrors };
+const generate6DigitOTP = () => {
+  return randomInt(100000, 1000000).toString().padStart(6, '0');
+};
+
+export {
+  filterRequestBody,
+  filterResponseBody,
+  flattenValidationErrors,
+  generate6DigitOTP,
+};
