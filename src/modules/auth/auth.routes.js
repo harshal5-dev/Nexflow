@@ -1,9 +1,16 @@
 import express from 'express';
 
-import { getCurrentUserProfile, signin, signup } from './auth.service.js';
+import {
+  getCurrentUserProfile,
+  sendResetPasswordOTP,
+  signin,
+  signup,
+  verifyResetPassword,
+} from './auth.service.js';
 import {
   validateForgotPassword,
   validateLoginUser,
+  validateResetPassword,
   validateSignUpUser,
 } from './auth.middleware.js';
 import { sendSuccessResponse } from '../../common/api.response.js';
@@ -56,15 +63,13 @@ router.post('/signin', validateLoginUser, async (req, res) => {
 });
 
 router.get('/is-authenticated', (req, res) => {
-  const isAuthenticated = !!req.user;
-  const message = isAuthenticated
-    ? 'User is authenticated'
-    : 'User is not authenticated';
+  const user = req.user;
+  const isAuthenticated = !!user;
 
   return sendSuccessResponse(res, {
     statusCode: STATUS_CODES.OK,
-    message,
-    data: isAuthenticated,
+    message: 'User is authenticated',
+    data: isAuthenticated ? { isAuthenticated, ...user } : null,
     path: req.originalUrl,
   });
 });
@@ -76,6 +81,21 @@ router.post('/forgot-password', validateForgotPassword, async (req, res) => {
     return sendSuccessResponse(res, {
       statusCode: STATUS_CODES.OK,
       message: 'Reset password OTP has been sent to the provided email.',
+      data: null,
+      path: req.originalUrl,
+    });
+  } catch (error) {
+    throw error;
+  }
+});
+
+router.post('/reset-password', validateResetPassword, async (req, res) => {
+  try {
+    await verifyResetPassword(req.body);
+
+    return sendSuccessResponse(res, {
+      statusCode: STATUS_CODES.OK,
+      message: 'Password has been reset successfully.',
       data: null,
       path: req.originalUrl,
     });

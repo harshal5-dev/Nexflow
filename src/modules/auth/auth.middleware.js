@@ -6,11 +6,13 @@ import {
 } from '../../common/utils.js';
 import {
   LOGIN_ALLOWED_FIELDS,
+  RESET_PASSWORD_ALLOWED_FIELDS,
   SIGNUP_ALLOWED_FIELDS,
 } from './auth.constants.js';
 import {
   forgotPasswordSchema,
   loginUserSchema,
+  resetPasswordSchema,
   signUpUserSchema,
 } from './auth.validator.js';
 
@@ -62,4 +64,25 @@ const validateForgotPassword = (req, res, next) => {
   next();
 };
 
-export { validateSignUpUser, validateLoginUser, validateForgotPassword };
+const validateResetPassword = (req, res, next) => {
+  const payload = filterRequestBody(req.body, RESET_PASSWORD_ALLOWED_FIELDS);
+
+  const { error, success } = resetPasswordSchema.safeParse(payload);
+  if (!success) {
+    throw new AppError(
+      'Invalid request data',
+      STATUS_CODES.BAD_REQUEST,
+      flattenValidationErrors(error)
+    );
+  }
+
+  req.body = payload;
+  next();
+};
+
+export {
+  validateSignUpUser,
+  validateLoginUser,
+  validateForgotPassword,
+  validateResetPassword,
+};

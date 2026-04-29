@@ -1,7 +1,5 @@
-import bcrypt from 'bcrypt';
-
 import userModel from './user.model.js';
-import { th } from 'zod/locales';
+import { en, th } from 'zod/locales';
 import AppError from '../../common/AppError.js';
 import { STATUS_CODES } from '../../common/constants.js';
 import {
@@ -9,7 +7,11 @@ import {
   USER_ROLE_FIELDS,
   USER_TENANT_FIELDS,
 } from './user.constants.js';
-import { filterResponseBody, generate6DigitOTP } from '../../common/utils.js';
+import {
+  encryptPassword,
+  filterResponseBody,
+  generate6DigitOTP,
+} from '../../common/utils.js';
 import { getTenantById } from '../tenant/tenant.service.js';
 import resetPasswordModel from './resetPassword.model.js';
 import { sendEmail } from '../../common/mailer.js';
@@ -17,8 +19,7 @@ import { sendEmail } from '../../common/mailer.js';
 const createUser = async (session, userData) => {
   try {
     const { password } = userData;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    userData.passwordHash = hashedPassword;
+    userData.passwordHash = encryptPassword(password);
     const createdUser = await new userModel(userData).save({ session });
     return createdUser.toObject();
   } catch (error) {
@@ -106,10 +107,38 @@ const sendResetPasswordMail = async (email, otp, name) => {
   }
 };
 
+const verifyResetPasswordOTP = async resetPasswordData => {
+  const { emailId, otp, password } = resetPasswordData;
+  const user = await getUserByEmail(emailId);
+
+  if (!user) {
+    throw new AppError(
+      'User with the provided email does not exist',
+      STATUS_CODES.NOT_FOUND
+    );
+  }
+
+  const resetPasswordRecord = await resetPasswordModel.findOne({
+    userId: user._id,
+    otp,
+    expiresAt: { $gt: new Date() },
+  });
+
+  if (!resetPasswordRecord) {
+    throw new AppError('Invalid or expired OTP', STATUS_CODES.BAD_REQUEST);
+  }
+
+  const passwordHash = encryptPassword(password);
+  await user.updateOne({ passwordHash });
+
+  await resetPasswordModel.deleteMany({ userId: user._id });
+};
+
 export {
   createUser,
   getUserByEmail,
   getUserById,
   getUserProfile,
   createResetPassword,
+  verifyResetPasswordOTP,
 };

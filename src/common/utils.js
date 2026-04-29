@@ -1,5 +1,6 @@
 import { randomInt } from 'crypto';
 import { flattenError } from 'zod';
+import bcrypt from 'bcrypt';
 
 const filterRequestBody = (body, allowedFields) => {
   return Object.keys(body)
@@ -33,9 +34,15 @@ const generate6DigitOTP = () => {
   return randomInt(100000, 1000000).toString().padStart(6, '0');
 };
 
+const encryptPassword = async password => {
+  const saltRounds = 10;
+  return await bcrypt.hash(password, saltRounds);
+};
+
 export {
   filterRequestBody,
   filterResponseBody,
   flattenValidationErrors,
   generate6DigitOTP,
+  encryptPassword,
 };

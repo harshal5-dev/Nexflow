@@ -43,4 +43,24 @@ const forgotPasswordSchema = z.object({
     .max(100, { error: 'Email must be at most 100 characters long' }),
 });
 
-export { signUpUserSchema, loginUserSchema, forgotPasswordSchema };
+const resetPasswordSchema = z.object({
+  emailId: z
+    .email({ error: 'Invalid email address' })
+    .trim()
+    .lowercase()
+    .max(100, { error: 'Email must be at most 100 characters long' }),
+  otp: z
+    .string({ error: 'OTP is required' })
+    .length(6, { error: 'OTP must be exactly 6 characters long' }),
+  password: z
+    .string({ error: 'Password is required' })
+    .min(8, { error: 'Password must be at least 8 characters long' })
+    .max(15, { error: 'Password must be at most 15 characters long' }),
+});
+
+export {
+  signUpUserSchema,
+  loginUserSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+};

@@ -5,6 +5,7 @@ import {
   createUser,
   getUserByEmail,
   getUserProfile,
+  verifyResetPasswordOTP,
 } from '../user/user.service.js';
 import { createTenant } from '../tenant/tenant.service.js';
 import { filterResponseBody } from '../../common/utils.js';
@@ -109,4 +110,18 @@ const sendResetPasswordOTP = async emailId => {
   }
 };
 
-export { signup, signin, getCurrentUserProfile };
+const verifyResetPassword = async resetPasswordData => {
+  try {
+    await verifyResetPasswordOTP(resetPasswordData);
+  } catch (error) {
+    throw error;
+  }
+};
+
+export {
+  signup,
+  signin,
+  getCurrentUserProfile,
+  verifyResetPassword,
+  sendResetPasswordOTP,
+};

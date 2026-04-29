@@ -43,6 +43,13 @@ const verifyJwtToken = async (req, res, next) => {
     const decoded = await jwt.verify(token, config.jwt.secret);
     const { sub, tenantId } = decoded;
 
+    if (!tenantId) {
+      throw new AppError(
+        'Unauthorized: Tenant ID not found in token',
+        STATUS_CODES.UNAUTHORIZED
+      );
+    }
+
     const subject = extractSubjectFromToken(sub);
 
     const user = await getUserById(subject);
