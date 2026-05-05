@@ -1,5 +1,4 @@
 import userModel from './user.model.js';
-import { en, th } from 'zod/locales';
 import AppError from '../../common/AppError.js';
 import { STATUS_CODES } from '../../common/constants.js';
 import {
@@ -19,7 +18,7 @@ import { sendEmail } from '../../common/mailer.js';
 const createUser = async (session, userData) => {
   try {
     const { password } = userData;
-    userData.passwordHash = encryptPassword(password);
+    userData.passwordHash = await encryptPassword(password);
     const createdUser = await new userModel(userData).save({ session });
     return createdUser.toObject();
   } catch (error) {
@@ -40,6 +39,22 @@ const getUserById = async userId => {
   try {
     const user = await userModel.findById(userId);
     return user ? user : null;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getUserProfileByEmail = async emailId => {
+  try {
+    const user = await userModel
+      .findOne({ emailId })
+      .populate('roleIds', USER_ROLE_FIELDS);
+
+    if (!user) {
+      throw new AppError('Invalid credentials', STATUS_CODES.UNAUTHORIZED);
+    }
+
+    return user;
   } catch (error) {
     throw error;
   }
@@ -128,10 +143,21 @@ const verifyResetPasswordOTP = async resetPasswordData => {
     throw new AppError('Invalid or expired OTP', STATUS_CODES.BAD_REQUEST);
   }
 
-  const passwordHash = encryptPassword(password);
+  const passwordHash = await encryptPassword(password);
   await user.updateOne({ passwordHash });
 
   await resetPasswordModel.deleteMany({ userId: user._id });
+};
+
+const updateUserProfile = async (userId, profileData) => {
+  try {
+    const updatedUser = await userModel.findByIdAndUpdate(userId, profileData, {
+      returnDocument: 'after',
+    });
+    return updatedUser.toObject();
+  } catch (error) {
+    throw error;
+  }
 };
 
 export {
@@ -141,4 +167,6 @@ export {
   getUserProfile,
   createResetPassword,
   verifyResetPasswordOTP,
+  getUserProfileByEmail,
+  updateUserProfile,
 };

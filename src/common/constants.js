@@ -12,7 +12,8 @@ const AUTH_EXCLUDED_PATHS = new Set([
   '/api/v1/auth/signin',
   '/api/v1/auth/signup',
   '/api/v1/auth/forgot-password',
-  '/api/v1/auth/verify-reset-password-otp',
+  '/api/v1/auth/reset-password',
+  '/api/v1/auth/me',
 ]);
 
 const PERMISSIONS = {

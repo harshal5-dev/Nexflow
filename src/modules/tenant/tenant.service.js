@@ -27,4 +27,17 @@ const createTenant = async (session, tenantData) => {
   }
 };
 
-export { createTenant, getTenantById };
+const updateTenant = async (tenantId, tenantData) => {
+  try {
+    const updatedTenant = await tenantModel.findByIdAndUpdate(
+      tenantId,
+      tenantData,
+      { returnDocument: 'after' }
+    );
+    return updatedTenant.toObject();
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { createTenant, getTenantById, updateTenant };

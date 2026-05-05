@@ -58,9 +58,24 @@ const resetPasswordSchema = z.object({
     .max(15, { error: 'Password must be at most 15 characters long' }),
 });
 
+const updateProfileSchema = z.object({
+  firstName: z
+    .string({ error: 'First name is required' })
+    .trim()
+    .min(2, { error: 'First name must be at least 2 characters long' })
+    .max(50, { error: 'First name must be at most 50 characters long' }),
+  lastName: z.optional(
+    z
+      .string()
+      .trim()
+      .max(50, { error: 'Last name must be at most 50 characters long' })
+  ),
+});
+
 export {
   signUpUserSchema,
   loginUserSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  updateProfileSchema,
 };

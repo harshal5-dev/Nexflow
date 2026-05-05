@@ -2,18 +2,26 @@ import mongoose from 'mongoose';
 
 import { sendEmail } from '../../common/mailer.js';
 import {
+  createResetPassword,
   createUser,
-  getUserByEmail,
   getUserProfile,
+  getUserProfileByEmail,
+  updateUserProfile,
   verifyResetPasswordOTP,
 } from '../user/user.service.js';
-import { createTenant } from '../tenant/tenant.service.js';
+import { createTenant, getTenantById } from '../tenant/tenant.service.js';
 import { filterResponseBody } from '../../common/utils.js';
-import { SIGNUP_RESPONSE_FIELDS } from './auth.constants.js';
+import {
+  SIGNUP_RESPONSE_FIELDS,
+  USER_PROFILE_UPDATABLE_FIELDS,
+} from './auth.constants.js';
 import AppError from '../../common/AppError.js';
 import { STATUS_CODES } from '../../common/constants.js';
 import { getDefaultRole } from '../role/role.service.js';
-import { tr } from 'zod/v4/locales';
+import {
+  USER_RESPONSE_FIELDS,
+  USER_TENANT_FIELDS,
+} from '../user/user.constants.js';
 
 const signup = async userPayload => {
   const session = await mongoose.startSession();
@@ -46,11 +54,7 @@ const signup = async userPayload => {
 const signin = async credentials => {
   try {
     const { emailId, password } = credentials;
-    const user = await getUserByEmail(credentials.emailId);
-
-    if (!user) {
-      throw new AppError('Invalid credentials', STATUS_CODES.UNAUTHORIZED);
-    }
+    const user = await getUserProfileByEmail(emailId);
 
     const isPasswordValid = await user.comparePassword(password);
 
@@ -60,9 +64,13 @@ const signin = async credentials => {
 
     const token = await user.getJWTToken();
 
+    const userObject = user.toObject();
+    userObject.tenant = await getTenantById(user.tenantId, USER_TENANT_FIELDS);
+    userObject.roles = user.roleIds;
+
     return {
       token,
-      user: filterResponseBody(user.toObject(), SIGNUP_RESPONSE_FIELDS),
+      user: filterResponseBody(userObject, USER_RESPONSE_FIELDS),
     };
   } catch (error) {
     throw error;
@@ -73,6 +81,15 @@ const getCurrentUserProfile = async userId => {
   try {
     const user = await getUserProfile(userId);
     return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateCurrentUserProfile = async (userId, profileData) => {
+  try {
+    const updatedUser = await updateUserProfile(userId, profileData);
+    return filterResponseBody(updatedUser, USER_PROFILE_UPDATABLE_FIELDS);
   } catch (error) {
     throw error;
   }
@@ -124,4 +141,5 @@ export {
   getCurrentUserProfile,
   verifyResetPassword,
   sendResetPasswordOTP,
+  updateCurrentUserProfile,
 };

@@ -3,12 +3,12 @@ import roleModel from './role.model.js';
 
 const getDefaultRole = async session => {
   const defaultRole = await roleModel.findOne({
-    $and: [{ code: 'PLATFORM_ADMIN' }, { scope: 'PLATFORM' }],
+    $and: [{ code: 'PLATFORM_OWNER' }, { scope: 'PLATFORM' }],
   });
   if (!defaultRole) {
     const defaultRoleData = {
-      name: 'Admin',
-      code: 'PLATFORM_ADMIN',
+      name: 'Owner',
+      code: 'PLATFORM_OWNER',
       scope: 'PLATFORM',
       permissions: [
         PERMISSIONS.MANAGE_USERS,

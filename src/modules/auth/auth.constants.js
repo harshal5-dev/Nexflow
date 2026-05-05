@@ -18,12 +18,24 @@ const AUTH_USER_FIELDS = [
   'tenantId',
 ];
 
+const USER_PROFILE_UPDATABLE_FIELDS = [
+  '_id',
+  'firstName',
+  'lastName',
+  'emailId',
+  'tenantId',
+];
+
 const RESET_PASSWORD_ALLOWED_FIELDS = ['emailId', 'otp', 'password'];
+
+const UPDATE_PROFILE_ALLOWED_FIELDS = ['firstName', 'lastName'];
 
 export {
   SIGNUP_ALLOWED_FIELDS,
   SIGNUP_RESPONSE_FIELDS,
   LOGIN_ALLOWED_FIELDS,
   AUTH_USER_FIELDS,
+  USER_PROFILE_UPDATABLE_FIELDS,
   RESET_PASSWORD_ALLOWED_FIELDS,
+  UPDATE_PROFILE_ALLOWED_FIELDS,
 };

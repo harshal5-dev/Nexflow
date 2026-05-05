@@ -7,6 +7,8 @@ import config from './config/index.js';
 
 import roleRoutes from './modules/role/role.routes.js';
 import authRoutes from './modules/auth/auth.routes.js';
+import tenantRoutes from './modules/tenant/tenant.routes.js';
+
 import errorHandlerMiddleware from './middlewares/errorHandler.middleware.js';
 import verifyJwtToken from './middlewares/verifyJwtToken.middleware.js';
 import corsConfig from './config/cors.js';
@@ -21,6 +23,7 @@ app.use(cookieParser());
 app.use(verifyJwtToken);
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/tenants', tenantRoutes);
 app.use('/api/v1/roles', roleRoutes);
 
 app.use(errorHandlerMiddleware);

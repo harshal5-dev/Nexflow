@@ -8,18 +8,20 @@ import {
   LOGIN_ALLOWED_FIELDS,
   RESET_PASSWORD_ALLOWED_FIELDS,
   SIGNUP_ALLOWED_FIELDS,
+  UPDATE_PROFILE_ALLOWED_FIELDS,
 } from './auth.constants.js';
 import {
   forgotPasswordSchema,
   loginUserSchema,
   resetPasswordSchema,
   signUpUserSchema,
+  updateProfileSchema,
 } from './auth.validator.js';
 
-const validateSignUpUser = (req, res, next) => {
+const validateSignUpUser = async (req, res, next) => {
   const payload = filterRequestBody(req.body, SIGNUP_ALLOWED_FIELDS);
 
-  const { error, success } = signUpUserSchema.safeParse(payload);
+  const { error, success } = await signUpUserSchema.safeParseAsync(payload);
   if (!success) {
     throw new AppError(
       'Invalid request data',
@@ -32,10 +34,10 @@ const validateSignUpUser = (req, res, next) => {
   next();
 };
 
-const validateLoginUser = (req, res, next) => {
+const validateLoginUser = async (req, res, next) => {
   const payload = filterRequestBody(req.body, LOGIN_ALLOWED_FIELDS);
 
-  const { error, success } = loginUserSchema.safeParse(payload);
+  const { error, success } = await loginUserSchema.safeParseAsync(payload);
   if (!success) {
     throw new AppError(
       'Invalid request data',
@@ -48,10 +50,10 @@ const validateLoginUser = (req, res, next) => {
   next();
 };
 
-const validateForgotPassword = (req, res, next) => {
+const validateForgotPassword = async (req, res, next) => {
   const payload = filterRequestBody(req.body, ['emailId']);
 
-  const { error, success } = forgotPasswordSchema.safeParse(payload);
+  const { error, success } = await forgotPasswordSchema.safeParseAsync(payload);
   if (!success) {
     throw new AppError(
       'Invalid request data',
@@ -64,10 +66,26 @@ const validateForgotPassword = (req, res, next) => {
   next();
 };
 
-const validateResetPassword = (req, res, next) => {
+const validateResetPassword = async (req, res, next) => {
   const payload = filterRequestBody(req.body, RESET_PASSWORD_ALLOWED_FIELDS);
 
-  const { error, success } = resetPasswordSchema.safeParse(payload);
+  const { error, success } = await resetPasswordSchema.safeParseAsync(payload);
+  if (!success) {
+    throw new AppError(
+      'Invalid request data',
+      STATUS_CODES.BAD_REQUEST,
+      flattenValidationErrors(error)
+    );
+  }
+
+  req.body = payload;
+  next();
+};
+
+const validateUpdateProfile = async (req, res, next) => {
+  const payload = filterRequestBody(req.body, UPDATE_PROFILE_ALLOWED_FIELDS);
+
+  const { error, success } = await updateProfileSchema.safeParseAsync(payload);
   if (!success) {
     throw new AppError(
       'Invalid request data',
@@ -85,4 +103,5 @@ export {
   validateLoginUser,
   validateForgotPassword,
   validateResetPassword,
+  validateUpdateProfile,
 };

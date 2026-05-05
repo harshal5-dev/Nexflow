@@ -7,6 +7,7 @@ import AppError from '../common/AppError.js';
 import { getUserById } from '../modules/user/user.service.js';
 import { filterResponseBody } from '../common/utils.js';
 import { AUTH_USER_FIELDS } from '../modules/auth/auth.constants.js';
+import { getCurrentUserProfile } from '../modules/auth/auth.service.js';
 
 const extractSubjectFromToken = sub => {
   try {
@@ -40,7 +41,7 @@ const verifyJwtToken = async (req, res, next) => {
       );
     }
 
-    const decoded = await jwt.verify(token, config.jwt.secret);
+    const decoded = jwt.verify(token, config.jwt.secret);
     const { sub, tenantId } = decoded;
 
     if (!tenantId) {
@@ -50,9 +51,9 @@ const verifyJwtToken = async (req, res, next) => {
       );
     }
 
-    const subject = extractSubjectFromToken(sub);
+    const userId = extractSubjectFromToken(sub);
 
-    const user = await getUserById(subject);
+    const user = await getUserById(userId);
 
     if (!user) {
       throw new AppError(
@@ -67,6 +68,36 @@ const verifyJwtToken = async (req, res, next) => {
   } catch (error) {
     throw error;
   }
+};
+
+export const checkAuthStatus = async (req, res, next) => {
+  let isAuthenticated = true;
+  try {
+    const cookies = req.cookies;
+
+    const token = cookies[config.cookies.jwt_token_name];
+
+    if (!token) {
+      isAuthenticated = false;
+    }
+
+    const decoded = jwt.verify(token, config.jwt.secret);
+    const { sub, tenantId } = decoded;
+
+    if (!tenantId) {
+      isAuthenticated = false;
+    }
+
+    const userId = extractSubjectFromToken(sub);
+
+    const user = await getCurrentUserProfile(userId);
+    req.user = user;
+    req.tenantId = tenantId;
+  } catch (error) {
+    isAuthenticated = false;
+  }
+  req.isAuthenticated = isAuthenticated;
+  next();
 };
 
 export default verifyJwtToken;

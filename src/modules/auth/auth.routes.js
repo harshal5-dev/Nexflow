@@ -1,10 +1,10 @@
 import express from 'express';
 
 import {
-  getCurrentUserProfile,
   sendResetPasswordOTP,
   signin,
   signup,
+  updateCurrentUserProfile,
   verifyResetPassword,
 } from './auth.service.js';
 import {
@@ -12,11 +12,13 @@ import {
   validateLoginUser,
   validateResetPassword,
   validateSignUpUser,
+  validateUpdateProfile,
 } from './auth.middleware.js';
 import { sendSuccessResponse } from '../../common/api.response.js';
 import { STATUS_CODES } from '../../common/constants.js';
 import AppError from '../../common/AppError.js';
 import config from '../../config/index.js';
+import { checkAuthStatus } from '../../middlewares/verifyJwtToken.middleware.js';
 
 const router = express.Router();
 
@@ -54,24 +56,12 @@ router.post('/signin', validateLoginUser, async (req, res) => {
     return sendSuccessResponse(res, {
       statusCode: STATUS_CODES.OK,
       message: 'User signed in successfully',
-      data: { ...user },
+      data: { user, isAuthenticated: true },
       path: req.originalUrl,
     });
   } catch (error) {
     throw error;
   }
-});
-
-router.get('/is-authenticated', (req, res) => {
-  const user = req.user;
-  const isAuthenticated = !!user;
-
-  return sendSuccessResponse(res, {
-    statusCode: STATUS_CODES.OK,
-    message: 'User is authenticated',
-    data: isAuthenticated ? { isAuthenticated, ...user } : null,
-    path: req.originalUrl,
-  });
 });
 
 router.post('/forgot-password', validateForgotPassword, async (req, res) => {
@@ -104,17 +94,34 @@ router.post('/reset-password', validateResetPassword, async (req, res) => {
   }
 });
 
-router.get('/me', async (req, res) => {
-  const userId = req.user._id;
-
-  const user = await getCurrentUserProfile(userId);
+router.get('/me', checkAuthStatus, async (req, res) => {
+  const user = req.user ? req.user : null;
+  const isAuthenticated = req.isAuthenticated;
+  const message = isAuthenticated
+    ? 'User details fetched successfully'
+    : 'User not authenticated';
 
   return sendSuccessResponse(res, {
     statusCode: STATUS_CODES.SUCCESS,
-    message: 'User details fetched successfully',
-    data: user,
+    message,
+    data: { isAuthenticated, user },
     path: req.originalUrl,
   });
+});
+
+router.put('/update', validateUpdateProfile, async (req, res) => {
+  try {
+    const { _id } = req.user;
+    const updatedUser = await updateCurrentUserProfile(_id, req.body);
+    return sendSuccessResponse(res, {
+      statusCode: STATUS_CODES.SUCCESS,
+      message: 'User profile updated successfully',
+      data: updatedUser,
+      path: req.originalUrl,
+    });
+  } catch (error) {
+    throw error;
+  }
 });
 
 router.post('/signout', (req, res) => {
