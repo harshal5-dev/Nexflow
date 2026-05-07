@@ -6,7 +6,10 @@ import config from '../config/index.js';
 import AppError from '../common/AppError.js';
 import { getUserById } from '../modules/user/user.service.js';
 import { filterResponseBody } from '../common/utils.js';
-import { AUTH_USER_FIELDS } from '../modules/auth/auth.constants.js';
+import {
+  AUTH_USER_FIELDS,
+  AUTH_USER_ROLE_FIELDS,
+} from '../modules/auth/auth.constants.js';
 import { getCurrentUserProfile } from '../modules/auth/auth.service.js';
 
 const extractSubjectFromToken = sub => {
@@ -22,6 +25,10 @@ const extractSubjectFromToken = sub => {
   } catch (error) {
     throw error;
   }
+};
+
+const setUserPermission = roles => {
+  return roles.flatMap(role => role.permissions);
 };
 
 const verifyJwtToken = async (req, res, next) => {
@@ -62,7 +69,11 @@ const verifyJwtToken = async (req, res, next) => {
       );
     }
 
-    req.user = filterResponseBody(user.toObject(), AUTH_USER_FIELDS);
+    await user.populate('roles', AUTH_USER_ROLE_FIELDS);
+    const userObject = user.toObject();
+    userObject.permissions = setUserPermission(userObject.roles);
+
+    req.user = filterResponseBody(userObject, AUTH_USER_FIELDS);
     req.tenantId = tenantId;
     next();
   } catch (error) {

@@ -35,7 +35,7 @@ const signup = async userPayload => {
       const createdUser = await createUser(session, {
         ...userPayload,
         tenantId: createdTenant._id,
-        roleIds: [defaultRole._id],
+        roles: [defaultRole._id],
       });
 
       await sendWelcomeMail(userPayload);
@@ -62,11 +62,10 @@ const signin = async credentials => {
       throw new AppError('Invalid credentials', STATUS_CODES.UNAUTHORIZED);
     }
 
-    const token = await user.getJWTToken();
+    const token = user.getJWTToken();
 
     const userObject = user.toObject();
     userObject.tenant = await getTenantById(user.tenantId, USER_TENANT_FIELDS);
-    userObject.roles = user.roleIds;
 
     return {
       token,

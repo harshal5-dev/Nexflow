@@ -39,10 +39,17 @@ const encryptPassword = async password => {
   return await bcrypt.hash(password, saltRounds);
 };
 
+const hasAnyPermission = (userPermissions, requiredPermissions) => {
+  return requiredPermissions.some(permission =>
+    userPermissions.includes(permission)
+  );
+};
+
 export {
   filterRequestBody,
   filterResponseBody,
   flattenValidationErrors,
   generate6DigitOTP,
   encryptPassword,
+  hasAnyPermission,
 };

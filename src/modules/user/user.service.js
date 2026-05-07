@@ -48,7 +48,7 @@ const getUserProfileByEmail = async emailId => {
   try {
     const user = await userModel
       .findOne({ emailId })
-      .populate('roleIds', USER_ROLE_FIELDS);
+      .populate('roles', USER_ROLE_FIELDS);
 
     if (!user) {
       throw new AppError('Invalid credentials', STATUS_CODES.UNAUTHORIZED);
@@ -64,14 +64,13 @@ const getUserProfile = async userId => {
   try {
     const user = await userModel
       .findById(userId)
-      .populate('roleIds', USER_ROLE_FIELDS);
+      .populate('roles', USER_ROLE_FIELDS);
     if (!user) {
       throw new AppError('User not found', STATUS_CODES.NOT_FOUND);
     }
 
     const userObj = user.toObject();
     userObj.tenant = await getTenantById(userObj.tenantId, USER_TENANT_FIELDS);
-    userObj.roles = userObj.roleIds;
 
     return filterResponseBody(userObj, USER_RESPONSE_FIELDS);
   } catch (error) {
@@ -160,6 +159,34 @@ const updateUserProfile = async (userId, profileData) => {
   }
 };
 
+const getRolesCountByUser = async tenantId => {
+  const roleCounts = await userModel.aggregate([
+    {
+      $match: {
+        tenantId,
+      },
+    },
+    {
+      $unwind: '$roles',
+    },
+    {
+      $group: {
+        _id: '$roles',
+        userCount: {
+          $sum: 1,
+        },
+      },
+    },
+  ]);
+  const countMap = new Map();
+
+  roleCounts.forEach(roleCount => {
+    countMap.set(roleCount._id.toString(), roleCount.userCount);
+  });
+
+  return countMap;
+};
+
 export {
   createUser,
   getUserByEmail,
@@ -169,4 +196,5 @@ export {
   verifyResetPasswordOTP,
   getUserProfileByEmail,
   updateUserProfile,
+  getRolesCountByUser,
 };

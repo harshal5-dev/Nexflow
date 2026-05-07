@@ -16,7 +16,10 @@ const AUTH_USER_FIELDS = [
   'lastName',
   'emailId',
   'tenantId',
+  'permissions',
 ];
+
+const AUTH_USER_ROLE_FIELDS = ['_id', 'name', 'code', 'permissions'];
 
 const USER_PROFILE_UPDATABLE_FIELDS = [
   '_id',
@@ -35,6 +38,7 @@ export {
   SIGNUP_RESPONSE_FIELDS,
   LOGIN_ALLOWED_FIELDS,
   AUTH_USER_FIELDS,
+  AUTH_USER_ROLE_FIELDS,
   USER_PROFILE_UPDATABLE_FIELDS,
   RESET_PASSWORD_ALLOWED_FIELDS,
   UPDATE_PROFILE_ALLOWED_FIELDS,

@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    roleIds: [
+    roles: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Role',
@@ -47,9 +47,9 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-userSchema.methods.getJWTToken = async function () {
+userSchema.methods.getJWTToken = function () {
   const user = this;
-  const token = await jwt.sign({ tenantId: user.tenantId }, config.jwt.secret, {
+  const token = jwt.sign({ tenantId: user.tenantId }, config.jwt.secret, {
     expiresIn: config.jwt.expiresIn,
     subject: user._id.toString(),
     issuer: config.jwt.issuer,
