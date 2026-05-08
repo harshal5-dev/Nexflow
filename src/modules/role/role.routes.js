@@ -1,11 +1,19 @@
 import express from 'express';
 import { sendSuccessResponse } from '../../common/api.response.js';
-import { createRole, getPermissions, getRoles } from './role.service.js';
+import {
+  createRole,
+  deleteRole,
+  getPermissions,
+  getRoles,
+  updateRole,
+} from './role.service.js';
 import { STATUS_CODES } from '../../common/constants.js';
 import {
   checkCreateRolePermissions,
+  checkDeleteRolePermissions,
   checkGetRolesPermissions,
-  validateCreateRole,
+  checkUpdateRolePermissions,
+  validateManageRole,
 } from './role.middleware.js';
 
 const router = express.Router();
@@ -42,7 +50,7 @@ router.get('/', checkGetRolesPermissions, async (req, res) => {
 router.post(
   '/',
   checkCreateRolePermissions,
-  validateCreateRole,
+  validateManageRole,
   async (req, res) => {
     try {
       const role = await createRole(req.body);
@@ -57,5 +65,37 @@ router.post(
     }
   }
 );
+
+router.put(
+  '/:id',
+  checkUpdateRolePermissions,
+  validateManageRole,
+  async (req, res) => {
+    try {
+      const role = await updateRole(req.params.id, req.body);
+      return sendSuccessResponse(res, {
+        statusCode: STATUS_CODES.OK,
+        message: 'Role updated successfully',
+        data: role,
+        path: req.originalUrl,
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
+router.delete('/:id', checkDeleteRolePermissions, async (req, res) => {
+  try {
+    await deleteRole(req.params.id);
+    return sendSuccessResponse(res, {
+      statusCode: STATUS_CODES.OK,
+      message: 'Role deleted successfully',
+      path: req.originalUrl,
+    });
+  } catch (error) {
+    throw error;
+  }
+});
 
 export default router;

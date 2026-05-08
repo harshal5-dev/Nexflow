@@ -43,18 +43,6 @@ const getPermissions = async () => {
   }
 };
 
-const createRole = async roleData => {
-  try {
-    const createdRole = await new roleModel(roleData).save();
-    return filterResponseBody(createdRole.toObject(), GET_ROLES_ALLOWED_FIELDS);
-  } catch (error) {
-    if (error.code === 11000) {
-      throw new AppError('Role already exists', STATUS_CODES.BAD_REQUEST);
-    }
-    throw error;
-  }
-};
-
 const getRoles = async tenantId => {
   try {
     const roles = await roleModel
@@ -78,4 +66,34 @@ const getRoles = async tenantId => {
   }
 };
 
-export { getDefaultRole, getPermissions, createRole, getRoles };
+const createRole = async roleData => {
+  try {
+    const createdRole = await new roleModel(roleData).save();
+    return filterResponseBody(createdRole.toObject(), GET_ROLES_ALLOWED_FIELDS);
+  } catch (error) {
+    if (error.code === 11000) {
+      throw new AppError('Role already exists', STATUS_CODES.BAD_REQUEST);
+    }
+    throw error;
+  }
+};
+
+const updateRole = async (roleId, roleData) => {
+  const updatedRole = await roleModel.findByIdAndUpdate(roleId, roleData, {
+    returnDocument: 'after',
+  });
+  return filterResponseBody(updatedRole.toObject(), GET_ROLES_ALLOWED_FIELDS);
+};
+
+const deleteRole = async roleId => {
+  await roleModel.findByIdAndDelete(roleId);
+};
+
+export {
+  getDefaultRole,
+  getPermissions,
+  createRole,
+  getRoles,
+  updateRole,
+  deleteRole,
+};

@@ -2,12 +2,23 @@ import AppError from '../../common/AppError.js';
 import { PERMISSIONS, STATUS_CODES } from '../../common/constants.js';
 import { filterRequestBody, hasAnyPermission } from '../../common/utils.js';
 import { CREATE_ROLE_ALLOWED_FIELDS } from './role.constants.js';
-import { createRoleSchema } from './role.validator.js';
+import { manageRoleSchema } from './role.validator.js';
 
-const validateCreateRole = async (req, _res, next) => {
+const checkRolePermission = (permissions, requiredPermissions) => {
+  const allowed = hasAnyPermission(permissions, requiredPermissions);
+
+  if (!allowed) {
+    throw new AppError(
+      'you do not have the required access.',
+      STATUS_CODES.FORBIDDEN
+    );
+  }
+};
+
+const validateManageRole = async (req, _res, next) => {
   const payload = filterRequestBody(req.body, CREATE_ROLE_ALLOWED_FIELDS);
 
-  const { error, success } = await createRoleSchema.safeParseAsync(payload);
+  const { error, success } = await manageRoleSchema.safeParseAsync(payload);
   if (!success) {
     throw new AppError(
       'Invalid request data',
@@ -25,40 +36,52 @@ const validateCreateRole = async (req, _res, next) => {
 
 const checkCreateRolePermissions = async (req, _res, next) => {
   const { permissions } = req.user;
-  const allowed = hasAnyPermission(permissions, [
+
+  checkRolePermission(permissions, [
     PERMISSIONS.MANAGE_ROLES,
     PERMISSIONS.CREATE_ROLES,
   ]);
 
-  if (!allowed) {
-    throw new AppError(
-      'you do not have the required access.',
-      STATUS_CODES.FORBIDDEN
-    );
-  }
+  next();
+};
+
+const checkUpdateRolePermissions = async (req, _res, next) => {
+  const { permissions } = req.user;
+
+  checkRolePermission(permissions, [
+    PERMISSIONS.MANAGE_ROLES,
+    PERMISSIONS.UPDATE_ROLES,
+  ]);
 
   next();
 };
 
 const checkGetRolesPermissions = async (req, _res, next) => {
   const { permissions } = req.user;
-  const allowed = hasAnyPermission(permissions, [
+
+  checkRolePermission(permissions, [
     PERMISSIONS.MANAGE_ROLES,
     PERMISSIONS.VIEW_LIST_ROLES,
   ]);
 
-  if (!allowed) {
-    throw new AppError(
-      'you do not have the required access.',
-      STATUS_CODES.FORBIDDEN
-    );
-  }
+  next();
+};
+
+const checkDeleteRolePermissions = async (req, _res, next) => {
+  const { permissions } = req.user;
+
+  checkRolePermission(permissions, [
+    PERMISSIONS.MANAGE_ROLES,
+    PERMISSIONS.DELETE_ROLES,
+  ]);
 
   next();
 };
 
 export {
-  validateCreateRole,
+  validateManageRole,
   checkCreateRolePermissions,
+  checkUpdateRolePermissions,
   checkGetRolesPermissions,
+  checkDeleteRolePermissions,
 };

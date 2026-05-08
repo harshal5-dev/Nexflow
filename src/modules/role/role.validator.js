@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-const createRoleSchema = z.object({
+const manageRoleSchema = z.object({
   name: z
     .string({ error: 'Name is required' })
     .trim()
@@ -20,4 +20,4 @@ const createRoleSchema = z.object({
   ),
 });
 
-export { createRoleSchema };
+export { manageRoleSchema };
