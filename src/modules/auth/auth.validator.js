@@ -72,10 +72,16 @@ const updateProfileSchema = z.object({
   ),
 });
 
+const acceptInvitationSchema = z.object({
+  token: z.string({ error: 'Token is required' }),
+  password: z.string({ error: 'Password is required' }),
+});
+
 export {
   signUpUserSchema,
   loginUserSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
   updateProfileSchema,
+  acceptInvitationSchema,
 };

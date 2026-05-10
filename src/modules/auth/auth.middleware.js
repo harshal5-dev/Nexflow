@@ -5,12 +5,14 @@ import {
   flattenValidationErrors,
 } from '../../common/utils.js';
 import {
+  ACCEPT_INVITATION_ALLOWED_FIELDS,
   LOGIN_ALLOWED_FIELDS,
   RESET_PASSWORD_ALLOWED_FIELDS,
   SIGNUP_ALLOWED_FIELDS,
   UPDATE_PROFILE_ALLOWED_FIELDS,
 } from './auth.constants.js';
 import {
+  acceptInvitationSchema,
   forgotPasswordSchema,
   loginUserSchema,
   resetPasswordSchema,
@@ -98,10 +100,30 @@ const validateUpdateProfile = async (req, res, next) => {
   next();
 };
 
+const validateAcceptInvitation = async (req, _res, next) => {
+  const payload = filterRequestBody(req.body, ACCEPT_INVITATION_ALLOWED_FIELDS);
+
+  const { error, success } =
+    await acceptInvitationSchema.safeParseAsync(payload);
+  if (!success) {
+    throw new AppError(
+      'Invalid request data',
+      STATUS_CODES.BAD_REQUEST,
+      flattenValidationErrors(error)
+    );
+  }
+
+  req.body = payload;
+  req.body.tenantId = req.tenantId;
+
+  next();
+};
+
 export {
   validateSignUpUser,
   validateLoginUser,
   validateForgotPassword,
   validateResetPassword,
   validateUpdateProfile,
+  validateAcceptInvitation,
 };

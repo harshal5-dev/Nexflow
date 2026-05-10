@@ -2,12 +2,10 @@ import mongoose from 'mongoose';
 
 import { sendEmail } from '../../common/mailer.js';
 import {
-  createResetPassword,
   createUser,
   getUserProfile,
   getUserProfileByEmail,
   updateUserProfile,
-  verifyResetPasswordOTP,
 } from '../user/user.service.js';
 import { createTenant, getTenantById } from '../tenant/tenant.service.js';
 import { filterResponseBody } from '../../common/utils.js';
@@ -22,6 +20,10 @@ import {
   USER_RESPONSE_FIELDS,
   USER_TENANT_FIELDS,
 } from '../user/user.constants.js';
+import {
+  createResetPassword,
+  verifyResetPasswordOTP,
+} from '../resetPassword/resetPassword.service.js';
 
 const signup = async userPayload => {
   const session = await mongoose.startSession();

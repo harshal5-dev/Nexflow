@@ -24,8 +24,8 @@ const userSchema = new mongoose.Schema(
     },
     passwordHash: {
       type: String,
-      required: true,
       maxLength: 250,
+      default: null,
     },
     profilePictureUrl: {
       type: String,
@@ -43,6 +43,11 @@ const userSchema = new mongoose.Schema(
         ref: 'Role',
       },
     ],
+    status: {
+      type: String,
+      enum: ['INVITED', 'ACTIVE', 'DISABLED', 'SUSPENDED'],
+      default: 'INVITED',
+    },
   },
   { timestamps: true }
 );

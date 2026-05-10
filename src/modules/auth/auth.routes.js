@@ -5,9 +5,9 @@ import {
   signin,
   signup,
   updateCurrentUserProfile,
-  verifyResetPassword,
 } from './auth.service.js';
 import {
+  validateAcceptInvitation,
   validateForgotPassword,
   validateLoginUser,
   validateResetPassword,
@@ -19,6 +19,7 @@ import { STATUS_CODES } from '../../common/constants.js';
 import AppError from '../../common/AppError.js';
 import config from '../../config/index.js';
 import { checkAuthStatus } from '../../middlewares/verifyJwtToken.middleware.js';
+import { acceptInvitation } from '../user/user.service.js';
 
 const router = express.Router();
 
@@ -138,5 +139,23 @@ router.post('/signout', (req, res) => {
     path: req.originalUrl,
   });
 });
+
+router.post(
+  '/accept-invitation',
+  validateAcceptInvitation,
+  async (req, res) => {
+    try {
+      const user = await acceptInvitation(req.body);
+      return sendSuccessResponse(res, {
+        statusCode: STATUS_CODES.OK,
+        message: 'Invitation accepted successfully',
+        path: req.originalUrl,
+        data: user,
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+);
 
 export default router;

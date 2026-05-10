@@ -11,6 +11,14 @@ const USER_RESPONSE_FIELDS = [
   'roles',
   'tenantId',
   'createdAt',
+  'status',
 ];
 
-export { USER_TENANT_FIELDS, USER_ROLE_FIELDS, USER_RESPONSE_FIELDS };
+const CREATE_USER_ALLOWED_FIELDS = ['firstName', 'lastName', 'emailId'];
+
+export {
+  USER_TENANT_FIELDS,
+  USER_ROLE_FIELDS,
+  USER_RESPONSE_FIELDS,
+  CREATE_USER_ALLOWED_FIELDS,
+};
