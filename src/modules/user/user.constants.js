@@ -12,13 +12,22 @@ const USER_RESPONSE_FIELDS = [
   'tenantId',
   'createdAt',
   'status',
+  'permissions',
 ];
 
-const CREATE_USER_ALLOWED_FIELDS = ['firstName', 'lastName', 'emailId'];
+const CREATE_USER_ALLOWED_FIELDS = [
+  'firstName',
+  'lastName',
+  'emailId',
+  'roles',
+];
+
+const UPDATE_USER_ALLOWED_FIELDS = ['firstName', 'lastName', 'roles'];
 
 export {
   USER_TENANT_FIELDS,
   USER_ROLE_FIELDS,
   USER_RESPONSE_FIELDS,
   CREATE_USER_ALLOWED_FIELDS,
+  UPDATE_USER_ALLOWED_FIELDS,
 };

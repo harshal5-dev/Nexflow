@@ -1,5 +1,9 @@
 import AppError from '../../common/AppError.js';
-import { PERMISSIONS, STATUS_CODES } from '../../common/constants.js';
+import {
+  PERMISSIONS,
+  PERMISSIONS_LIST,
+  STATUS_CODES,
+} from '../../common/constants.js';
 import { filterResponseBody } from '../../common/utils.js';
 import { getRolesCountByUser } from '../user/user.service.js';
 import { GET_ROLES_ALLOWED_FIELDS } from './role.constants.js';
@@ -21,6 +25,7 @@ const getDefaultRole = async session => {
           PERMISSIONS.MANAGE_TASKS,
           PERMISSIONS.MANAGE_PROJECTS,
           PERMISSIONS.UPDATE_TENANT,
+          PERMISSIONS.VIEW_TEAM_STATS,
         ],
       };
       const createdRole = await new roleModel(defaultRoleData).save({
@@ -36,7 +41,7 @@ const getDefaultRole = async session => {
 
 const getPermissions = async () => {
   try {
-    const permissions = Object.values(PERMISSIONS);
+    const permissions = PERMISSIONS_LIST;
     return permissions;
   } catch (error) {
     throw error;
@@ -79,14 +84,27 @@ const createRole = async roleData => {
 };
 
 const updateRole = async (roleId, roleData) => {
-  const updatedRole = await roleModel.findByIdAndUpdate(roleId, roleData, {
-    returnDocument: 'after',
-  });
-  return filterResponseBody(updatedRole.toObject(), GET_ROLES_ALLOWED_FIELDS);
+  try {
+    const updatedRole = await roleModel.findByIdAndUpdate(roleId, roleData, {
+      returnDocument: 'after',
+    });
+    return filterResponseBody(updatedRole.toObject(), GET_ROLES_ALLOWED_FIELDS);
+  } catch (error) {
+    throw error;
+  }
 };
 
-const deleteRole = async roleId => {
-  await roleModel.findByIdAndDelete(roleId);
+const countRoles = async tenantId => {
+  try {
+    const count = await roleModel
+      .countDocuments({ scope: 'TENANT' })
+      .setOptions({
+        tenantId,
+      });
+    return count;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export {
@@ -95,5 +113,5 @@ export {
   createRole,
   getRoles,
   updateRole,
-  deleteRole,
+  countRoles,
 };

@@ -17,9 +17,10 @@ const AUTH_USER_FIELDS = [
   'emailId',
   'tenantId',
   'permissions',
+  'roles',
 ];
 
-const AUTH_USER_ROLE_FIELDS = ['_id', 'name', 'code', 'permissions'];
+const AUTH_USER_ROLE_FIELDS = ['_id', 'name', 'code'];
 
 const USER_PROFILE_UPDATABLE_FIELDS = [
   '_id',

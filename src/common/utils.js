@@ -45,6 +45,19 @@ const hasAnyPermission = (userPermissions, requiredPermissions) => {
   );
 };
 
+const setUserPermission = roles => {
+  return roles.flatMap(role => role.permissions);
+};
+
+const filterObjectFields = (obj, allowedFields) => {
+  return Object.keys(obj)
+    .filter(key => allowedFields.includes(key))
+    .reduce((acc, key) => {
+      acc[key] = obj[key];
+      return acc;
+    }, {});
+};
+
 export {
   filterRequestBody,
   filterResponseBody,
@@ -52,4 +65,6 @@ export {
   generate6DigitOTP,
   encryptPassword,
   hasAnyPermission,
+  setUserPermission,
+  filterObjectFields,
 };

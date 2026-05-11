@@ -2,7 +2,6 @@ import express from 'express';
 import { sendSuccessResponse } from '../../common/api.response.js';
 import {
   createRole,
-  deleteRole,
   getPermissions,
   getRoles,
   updateRole,
@@ -10,7 +9,6 @@ import {
 import { STATUS_CODES } from '../../common/constants.js';
 import {
   checkCreateRolePermissions,
-  checkDeleteRolePermissions,
   checkGetRolesPermissions,
   checkUpdateRolePermissions,
   validateManageRole,
@@ -84,18 +82,5 @@ router.put(
     }
   }
 );
-
-router.delete('/:id', checkDeleteRolePermissions, async (req, res) => {
-  try {
-    await deleteRole(req.params.id);
-    return sendSuccessResponse(res, {
-      statusCode: STATUS_CODES.OK,
-      message: 'Role deleted successfully',
-      path: req.originalUrl,
-    });
-  } catch (error) {
-    throw error;
-  }
-});
 
 export default router;

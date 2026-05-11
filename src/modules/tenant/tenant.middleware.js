@@ -1,6 +1,9 @@
 import AppError from '../../common/AppError.js';
 import { PERMISSIONS, STATUS_CODES } from '../../common/constants.js';
-import { filterRequestBody } from '../../common/utils.js';
+import {
+  filterRequestBody,
+  flattenValidationErrors,
+} from '../../common/utils.js';
 import { UPDATE_TENANT_ALLOWED_FIELDS } from './tenant.constants.js';
 import { updateTenantSchema } from './tenant.validator.js';
 
@@ -12,7 +15,7 @@ const validateUpdateTenant = async (req, _res, next) => {
     throw new AppError(
       'Invalid request data',
       STATUS_CODES.BAD_REQUEST,
-      flattenValidationErrors(error)
+      flattenValidationErrorsValidationErrors(error)
     );
   }
 

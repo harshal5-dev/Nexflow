@@ -10,14 +10,16 @@ const manageRoleSchema = z.object({
     z
       .string()
       .trim()
-      .max(50, { error: 'Description must be at most 50 characters long' })
+      .max(250, { error: 'Description must be at most 50 characters long' })
   ),
-  permissions: z.array(
-    z
-      .string()
-      .trim()
-      .max(50, { error: 'Permission must be at most 50 characters long' })
-  ),
+  permissions: z
+    .array(
+      z
+        .string()
+        .trim()
+        .max(50, { error: 'Permission must be at most 50 characters long' })
+    )
+    .min(1, { error: 'At least one permission is required' }),
 });
 
 export { manageRoleSchema };

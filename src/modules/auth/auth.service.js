@@ -8,8 +8,9 @@ import {
   updateUserProfile,
 } from '../user/user.service.js';
 import { createTenant, getTenantById } from '../tenant/tenant.service.js';
-import { filterResponseBody } from '../../common/utils.js';
+import { filterObjectFields, filterResponseBody } from '../../common/utils.js';
 import {
+  AUTH_USER_ROLE_FIELDS,
   SIGNUP_RESPONSE_FIELDS,
   USER_PROFILE_UPDATABLE_FIELDS,
 } from './auth.constants.js';
@@ -64,10 +65,18 @@ const signin = async credentials => {
       throw new AppError('Invalid credentials', STATUS_CODES.UNAUTHORIZED);
     }
 
+    if (user.status === 'DELETED') {
+      throw new AppError('Invalid credentials', STATUS_CODES.UNAUTHORIZED);
+    }
+
     const token = user.getJWTToken();
 
     const userObject = user.toObject();
     userObject.tenant = await getTenantById(user.tenantId, USER_TENANT_FIELDS);
+    userObject.permissions = userObject.roles.flatMap(role => role.permissions);
+    userObject.roles = userObject.roles.map(role =>
+      filterObjectFields(role, AUTH_USER_ROLE_FIELDS)
+    );
 
     return {
       token,

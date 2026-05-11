@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
 import config from '../../config/index.js';
+import tenantPlugin from '../../common/tenantPlugin.js';
 
 const userSchema = new mongoose.Schema(
   {
@@ -37,6 +38,11 @@ const userSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    type: {
+      type: String,
+      enum: ['PLATFORM', 'TENANT'],
+      default: 'TENANT',
+    },
     roles: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -45,7 +51,7 @@ const userSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ['INVITED', 'ACTIVE', 'DISABLED', 'SUSPENDED'],
+      enum: ['INVITED', 'ACTIVE', 'DISABLED', 'SUSPENDED', 'DELETED'],
       default: 'INVITED',
     },
   },
@@ -66,5 +72,7 @@ userSchema.methods.comparePassword = async function (password) {
   const user = this;
   return await bcrypt.compare(password, user.passwordHash);
 };
+
+userSchema.plugin(tenantPlugin);
 
 export default mongoose.model('User', userSchema);

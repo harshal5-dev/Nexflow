@@ -5,7 +5,7 @@ import { AUTH_EXCLUDED_PATHS, STATUS_CODES } from '../common/constants.js';
 import config from '../config/index.js';
 import AppError from '../common/AppError.js';
 import { getUserById } from '../modules/user/user.service.js';
-import { filterResponseBody } from '../common/utils.js';
+import { filterObjectFields, setUserPermission } from '../common/utils.js';
 import {
   AUTH_USER_FIELDS,
   AUTH_USER_ROLE_FIELDS,
@@ -27,8 +27,11 @@ const extractSubjectFromToken = sub => {
   }
 };
 
-const setUserPermission = roles => {
-  return roles.flatMap(role => role.permissions);
+const convertTenantId = tenantId => {
+  if (!mongoose.isValidObjectId(tenantId)) {
+    throw new AppError('Invalid tenant ID', STATUS_CODES.BAD_REQUEST);
+  }
+  return new mongoose.Types.ObjectId(tenantId);
 };
 
 const verifyJwtToken = async (req, res, next) => {
@@ -69,19 +72,31 @@ const verifyJwtToken = async (req, res, next) => {
       );
     }
 
-    await user.populate('roles', AUTH_USER_ROLE_FIELDS);
-    const userObject = user.toObject();
-    userObject.permissions = setUserPermission(userObject.roles);
+    if (user.status === 'DELETED') {
+      throw new AppError(
+        'Unauthorized: User not found',
+        STATUS_CODES.UNAUTHORIZED
+      );
+    }
 
-    req.user = filterResponseBody(userObject, AUTH_USER_FIELDS);
-    req.tenantId = tenantId;
+    await user.populate('roles', [...AUTH_USER_ROLE_FIELDS, 'permissions']);
+    const userObject = user.toObject();
+
+    const roles = userObject.roles;
+    userObject.permissions = setUserPermission(roles);
+    userObject.roles = roles.map(role =>
+      filterObjectFields(role, AUTH_USER_ROLE_FIELDS)
+    );
+
+    req.user = filterObjectFields(userObject, AUTH_USER_FIELDS);
+    req.tenantId = convertTenantId(tenantId);
     next();
   } catch (error) {
     throw error;
   }
 };
 
-export const checkAuthStatus = async (req, res, next) => {
+export const checkAuthStatus = async (req, _res, next) => {
   let isAuthenticated = true;
   try {
     const cookies = req.cookies;

@@ -1,6 +1,14 @@
 import AppError from '../../common/AppError.js';
-import { PERMISSIONS, STATUS_CODES } from '../../common/constants.js';
-import { filterRequestBody, hasAnyPermission } from '../../common/utils.js';
+import {
+  PERMISSIONS,
+  PERMISSIONS_LIST,
+  STATUS_CODES,
+} from '../../common/constants.js';
+import {
+  filterRequestBody,
+  flattenValidationErrors,
+  hasAnyPermission,
+} from '../../common/utils.js';
 import { CREATE_ROLE_ALLOWED_FIELDS } from './role.constants.js';
 import { manageRoleSchema } from './role.validator.js';
 
@@ -30,6 +38,9 @@ const validateManageRole = async (req, _res, next) => {
   req.body = payload;
   req.body.tenantId = req.tenantId;
   req.body.code = req.body.name.replace(/\s+/g, '_').toLowerCase();
+  req.body.permissions = PERMISSIONS_LIST.filter(p =>
+    payload.permissions.includes(p)
+  );
 
   next();
 };
@@ -37,10 +48,7 @@ const validateManageRole = async (req, _res, next) => {
 const checkCreateRolePermissions = async (req, _res, next) => {
   const { permissions } = req.user;
 
-  checkRolePermission(permissions, [
-    PERMISSIONS.MANAGE_ROLES,
-    PERMISSIONS.CREATE_ROLES,
-  ]);
+  checkRolePermission(permissions, [PERMISSIONS.MANAGE_ROLES]);
 
   next();
 };
@@ -48,10 +56,7 @@ const checkCreateRolePermissions = async (req, _res, next) => {
 const checkUpdateRolePermissions = async (req, _res, next) => {
   const { permissions } = req.user;
 
-  checkRolePermission(permissions, [
-    PERMISSIONS.MANAGE_ROLES,
-    PERMISSIONS.UPDATE_ROLES,
-  ]);
+  checkRolePermission(permissions, [PERMISSIONS.MANAGE_ROLES]);
 
   next();
 };
@@ -67,21 +72,9 @@ const checkGetRolesPermissions = async (req, _res, next) => {
   next();
 };
 
-const checkDeleteRolePermissions = async (req, _res, next) => {
-  const { permissions } = req.user;
-
-  checkRolePermission(permissions, [
-    PERMISSIONS.MANAGE_ROLES,
-    PERMISSIONS.DELETE_ROLES,
-  ]);
-
-  next();
-};
-
 export {
   validateManageRole,
   checkCreateRolePermissions,
   checkUpdateRolePermissions,
   checkGetRolesPermissions,
-  checkDeleteRolePermissions,
 };
