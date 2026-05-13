@@ -34,15 +34,35 @@ const convertTenantId = tenantId => {
   return new mongoose.Types.ObjectId(tenantId);
 };
 
+const extractBearerToken = authHeader => {
+  if (!authHeader || typeof authHeader !== 'string') {
+    return null;
+  }
+
+  const [scheme, token, ...extraParts] = authHeader.trim().split(' ');
+  if (extraParts.length || scheme.toLowerCase() !== 'bearer' || !token) {
+    return null;
+  }
+
+  return token;
+};
+
+const getJwtTokenFromRequest = req => {
+  const cookieToken = req.cookies?.[config.cookies.jwt_token_name];
+  if (cookieToken) {
+    return cookieToken;
+  }
+
+  return extractBearerToken(req.headers.authorization);
+};
+
 const verifyJwtToken = async (req, res, next) => {
   if (req.method === 'OPTIONS' || AUTH_EXCLUDED_PATHS.has(req.path)) {
     return next();
   }
 
   try {
-    const cookies = req.cookies;
-
-    const token = cookies[config.cookies.jwt_token_name];
+    const token = getJwtTokenFromRequest(req);
 
     if (!token) {
       throw new AppError(
@@ -99,19 +119,19 @@ const verifyJwtToken = async (req, res, next) => {
 export const checkAuthStatus = async (req, _res, next) => {
   let isAuthenticated = true;
   try {
-    const cookies = req.cookies;
-
-    const token = cookies[config.cookies.jwt_token_name];
+    const token = getJwtTokenFromRequest(req);
 
     if (!token) {
-      isAuthenticated = false;
+      req.isAuthenticated = false;
+      return next();
     }
 
     const decoded = jwt.verify(token, config.jwt.secret);
     const { sub, tenantId } = decoded;
 
     if (!tenantId) {
-      isAuthenticated = false;
+      req.isAuthenticated = false;
+      return next();
     }
 
     const userId = extractSubjectFromToken(sub);

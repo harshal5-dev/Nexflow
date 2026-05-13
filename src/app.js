@@ -4,11 +4,13 @@ import cors from 'cors';
 
 import { connectDB } from './config/database.js';
 import config from './config/index.js';
+import setupSwagger from './docs/swagger.js';
 
 import roleRoutes from './modules/role/role.routes.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import tenantRoutes from './modules/tenant/tenant.routes.js';
 import userRoutes from './modules/user/user.routes.js';
+import projectRoutes from './modules/project/project.routes.js';
 
 import errorHandlerMiddleware from './middlewares/errorHandler.middleware.js';
 import verifyJwtToken from './middlewares/verifyJwtToken.middleware.js';
@@ -21,12 +23,14 @@ app.options(/.*/, cors(corsConfig)); // Express 5-safe preflight handler for all
 
 app.use(express.json({ limit: '5mb' }));
 app.use(cookieParser());
+setupSwagger(app);
 app.use(verifyJwtToken);
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tenants', tenantRoutes);
 app.use('/api/v1/roles', roleRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/projects', projectRoutes);
 
 app.use(errorHandlerMiddleware);
 

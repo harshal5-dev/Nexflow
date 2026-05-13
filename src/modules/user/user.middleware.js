@@ -79,9 +79,21 @@ const checkGetAllMemberPermissions = async (req, _res, next) => {
   next();
 };
 
+const checkGetTeamStatesPermissions = async (req, _res, next) => {
+  const { permissions } = req.user;
+
+  checkUserPermission(permissions, [
+    PERMISSIONS.MANAGE_USERS,
+    PERMISSIONS.VIEW_TEAM_STATS,
+  ]);
+
+  next();
+};
+
 export {
   validateCreateMember,
   checkManageMemberPermissions,
   checkGetAllMemberPermissions,
+  checkGetTeamStatesPermissions,
   validateUpdateMember,
 };

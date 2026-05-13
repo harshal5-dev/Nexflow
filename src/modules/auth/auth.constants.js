@@ -18,6 +18,7 @@ const AUTH_USER_FIELDS = [
   'tenantId',
   'permissions',
   'roles',
+  'type',
 ];
 
 const AUTH_USER_ROLE_FIELDS = ['_id', 'name', 'code'];

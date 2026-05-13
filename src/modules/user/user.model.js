@@ -35,8 +35,7 @@ const userSchema = new mongoose.Schema(
     },
     tenantId: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      index: true,
+      ref: 'Tenant',
     },
     type: {
       type: String,
@@ -54,6 +53,12 @@ const userSchema = new mongoose.Schema(
       enum: ['INVITED', 'ACTIVE', 'DISABLED', 'SUSPENDED', 'DELETED'],
       default: 'INVITED',
     },
+    projects: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project',
+      },
+    ],
   },
   { timestamps: true }
 );

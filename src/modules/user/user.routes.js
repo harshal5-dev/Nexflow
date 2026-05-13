@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   checkManageMemberPermissions,
   checkGetAllMemberPermissions,
+  checkGetTeamStatesPermissions,
   validateCreateMember,
   validateUpdateMember,
 } from './user.middleware.js';
@@ -31,7 +32,7 @@ router.get('/', checkGetAllMemberPermissions, async (req, res) => {
   }
 });
 
-router.get('/team-states', async (req, res) => {
+router.get('/team-states', checkGetTeamStatesPermissions, async (req, res) => {
   try {
     const teamStates = await getTeamStates(req.tenantId);
     return sendSuccessResponse(res, {

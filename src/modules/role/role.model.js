@@ -31,7 +31,7 @@ const roleSchema = new mongoose.Schema(
     ],
     tenantId: {
       type: mongoose.Schema.Types.ObjectId,
-      index: true,
+      ref: 'Tenant',
     },
   },
   { timestamps: true }

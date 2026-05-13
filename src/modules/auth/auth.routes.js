@@ -5,6 +5,7 @@ import {
   signin,
   signup,
   updateCurrentUserProfile,
+  verifyResetPassword,
 } from './auth.service.js';
 import {
   validateAcceptInvitation,
@@ -57,7 +58,7 @@ router.post('/signin', validateLoginUser, async (req, res) => {
     return sendSuccessResponse(res, {
       statusCode: STATUS_CODES.OK,
       message: 'User signed in successfully',
-      data: { user, isAuthenticated: true },
+      data: { token, user, isAuthenticated: true },
       path: req.originalUrl,
     });
   } catch (error) {

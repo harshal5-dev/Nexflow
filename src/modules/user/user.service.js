@@ -3,6 +3,7 @@ import userModel from './user.model.js';
 import AppError from '../../common/AppError.js';
 import { PERMISSIONS_LIST, STATUS_CODES } from '../../common/constants.js';
 import {
+  USER_LOOKUP_FIELDS,
   USER_RESPONSE_FIELDS,
   USER_ROLE_FIELDS,
   USER_TENANT_FIELDS,
@@ -35,20 +36,44 @@ const createUser = async (session, userData) => {
 };
 
 const getAllMembers = async (userId, tenantId) => {
-  const users = await userModel
-    .find({
-      _id: { $ne: userId },
-      type: 'TENANT',
-      status: { $ne: 'DELETED' },
-    })
-    .setOptions({ tenantId })
-    .populate('roles', USER_ROLE_FIELDS);
+  try {
+    const users = await userModel
+      .find({
+        _id: { $ne: userId },
+        type: 'TENANT',
+        status: { $ne: 'DELETED' },
+      })
+      .setOptions({ tenantId })
+      .populate('roles', USER_ROLE_FIELDS);
 
-  const userList = users.map(user =>
-    filterResponseBody(user.toObject(), USER_RESPONSE_FIELDS)
-  );
+    const userList = users.map(user =>
+      filterResponseBody(user.toObject(), USER_RESPONSE_FIELDS)
+    );
 
-  return userList;
+    return userList;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getProjectLookUpUsers = async (userId, tenantId) => {
+  try {
+    const users = await userModel
+      .find({
+        _id: { $ne: userId },
+        type: 'TENANT',
+        status: { $ne: 'DELETED' },
+      })
+      .setOptions({ tenantId });
+
+    const userList = users.map(user =>
+      filterResponseBody(user.toObject(), USER_LOOKUP_FIELDS)
+    );
+
+    return userList;
+  } catch (error) {
+    throw error;
+  }
 };
 
 const getUserByEmail = async emailId => {
@@ -322,4 +347,5 @@ export {
   updateMember,
   deleteMember,
   getTeamStates,
+  getProjectLookUpUsers,
 };

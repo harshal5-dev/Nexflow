@@ -15,6 +15,8 @@ const USER_RESPONSE_FIELDS = [
   'permissions',
 ];
 
+const USER_LOOKUP_FIELDS = ['_id', 'firstName', 'lastName', 'emailId'];
+
 const CREATE_USER_ALLOWED_FIELDS = [
   'firstName',
   'lastName',
@@ -28,6 +30,7 @@ export {
   USER_TENANT_FIELDS,
   USER_ROLE_FIELDS,
   USER_RESPONSE_FIELDS,
+  USER_LOOKUP_FIELDS,
   CREATE_USER_ALLOWED_FIELDS,
   UPDATE_USER_ALLOWED_FIELDS,
 };
