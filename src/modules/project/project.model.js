@@ -15,6 +15,8 @@ const projectSchema = new mongoose.Schema(
         'CANCELLED',
         'ON_HOLD',
         'REVIEW',
+        'TODO',
+        'DELETED',
       ],
       default: 'IN_PROGRESS',
     },

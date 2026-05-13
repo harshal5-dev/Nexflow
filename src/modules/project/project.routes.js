@@ -1,14 +1,18 @@
 import express from 'express';
 import {
   createProject,
+  deleteProject,
   getAllProjects,
   getLoopUpUsers,
+  updateProject,
 } from './project.service.js';
 import { sendSuccessResponse } from '../../common/api.response.js';
 import { STATUS_CODES } from '../../common/constants.js';
 import {
   checkCreateProjectPermissions,
+  checkDeleteProjectPermissions,
   checkGetAllProjectsPermissions,
+  checkUpdateProjectPermissions,
   validateManageProject,
 } from './project.middleware.js';
 
@@ -50,6 +54,39 @@ router.post(
     }
   }
 );
+
+router.put(
+  '/:id',
+  checkUpdateProjectPermissions,
+  validateManageProject,
+  async (req, res) => {
+    try {
+      const project = await updateProject(req.params.id, req.body);
+      return sendSuccessResponse(res, {
+        statusCode: STATUS_CODES.OK,
+        message: 'Project updated successfully',
+        data: project,
+        path: req.originalUrl,
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
+router.delete('/:id', checkDeleteProjectPermissions, async (req, res) => {
+  try {
+    const project = await deleteProject(req.params.id, req.tenantId);
+    return sendSuccessResponse(res, {
+      statusCode: STATUS_CODES.OK,
+      message: 'Project deleted successfully',
+      data: project,
+      path: req.originalUrl,
+    });
+  } catch (error) {
+    throw error;
+  }
+});
 
 router.get('/lookup-users', async (req, res) => {
   try {

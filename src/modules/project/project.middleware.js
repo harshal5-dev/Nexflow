@@ -32,9 +32,10 @@ const validateManageProject = async (req, _res, next) => {
   }
 
   payload.tenantId = req.tenantId;
-  payload.createdBy = req.user._id;
+  if (!req.isUpdateProject) {
+    payload.createdBy = req.user._id;
+  }
   req.body = payload;
-  req.body.tenantId = req.tenantId;
 
   next();
 };
@@ -50,6 +51,18 @@ const checkCreateProjectPermissions = async (req, _res, next) => {
   next();
 };
 
+const checkUpdateProjectPermissions = async (req, _res, next) => {
+  const { permissions } = req.user;
+
+  checkProjectPermission(permissions, [
+    PERMISSIONS.MANAGE_PROJECTS,
+    PERMISSIONS.UPDATE_PROJECTS,
+  ]);
+
+  req.isUpdateProject = true;
+  next();
+};
+
 const checkGetAllProjectsPermissions = async (req, _res, next) => {
   const { permissions } = req.user;
 
@@ -61,8 +74,21 @@ const checkGetAllProjectsPermissions = async (req, _res, next) => {
   next();
 };
 
+const checkDeleteProjectPermissions = async (req, _res, next) => {
+  const { permissions } = req.user;
+
+  checkProjectPermission(permissions, [
+    PERMISSIONS.MANAGE_PROJECTS,
+    PERMISSIONS.DELETE_PROJECTS,
+  ]);
+
+  next();
+};
+
 export {
   checkCreateProjectPermissions,
   validateManageProject,
   checkGetAllProjectsPermissions,
+  checkUpdateProjectPermissions,
+  checkDeleteProjectPermissions,
 };
