@@ -63,6 +63,17 @@ const checkUpdateProjectPermissions = async (req, _res, next) => {
   next();
 };
 
+const checkGetProjectPermissions = async (req, _res, next) => {
+  const { permissions } = req.user;
+
+  checkProjectPermission(permissions, [
+    PERMISSIONS.MANAGE_PROJECTS,
+    PERMISSIONS.VIEW_PROJECTS,
+  ]);
+
+  next();
+};
+
 const checkGetAllProjectsPermissions = async (req, _res, next) => {
   const { permissions } = req.user;
 
@@ -85,10 +96,20 @@ const checkDeleteProjectPermissions = async (req, _res, next) => {
   next();
 };
 
+const checkGetProjectStatesPermissions = async (req, _res, next) => {
+  const { permissions } = req.user;
+
+  checkProjectPermission(permissions, [PERMISSIONS.MANAGE_PROJECTS]);
+
+  next();
+};
+
 export {
   checkCreateProjectPermissions,
   validateManageProject,
   checkGetAllProjectsPermissions,
   checkUpdateProjectPermissions,
   checkDeleteProjectPermissions,
+  checkGetProjectStatesPermissions,
+  checkGetProjectPermissions,
 };

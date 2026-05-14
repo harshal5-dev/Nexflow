@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import tenantPlugin from '../../common/tenantPlugin.js';
 
 const CommentSchema = new mongoose.Schema(
   {
@@ -9,5 +10,7 @@ const CommentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+CommentSchema.plugin(tenantPlugin);
 
 export default mongoose.model('Comment', CommentSchema);

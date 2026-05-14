@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import tenantPlugin from '../../common/tenantPlugin.js';
+
 import '../task/task.model.js';
 
 const projectSchema = new mongoose.Schema(

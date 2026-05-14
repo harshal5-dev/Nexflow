@@ -4,6 +4,9 @@ import {
   deleteProject,
   getAllProjects,
   getLoopUpUsers,
+  getProjectById,
+  getProjectStates,
+  getTasksByProject,
   updateProject,
 } from './project.service.js';
 import { sendSuccessResponse } from '../../common/api.response.js';
@@ -12,6 +15,8 @@ import {
   checkCreateProjectPermissions,
   checkDeleteProjectPermissions,
   checkGetAllProjectsPermissions,
+  checkGetProjectPermissions,
+  checkGetProjectStatesPermissions,
   checkUpdateProjectPermissions,
   validateManageProject,
 } from './project.middleware.js';
@@ -95,6 +100,48 @@ router.get('/lookup-users', async (req, res) => {
       statusCode: STATUS_CODES.OK,
       message: 'Users fetched successfully',
       data: users,
+      path: req.originalUrl,
+    });
+  } catch (error) {
+    throw error;
+  }
+});
+
+router.get('/states', checkGetProjectStatesPermissions, async (req, res) => {
+  try {
+    const states = await getProjectStates(req.tenantId);
+    return sendSuccessResponse(res, {
+      statusCode: STATUS_CODES.OK,
+      message: 'Project states fetched successfully',
+      data: states,
+      path: req.originalUrl,
+    });
+  } catch (error) {
+    throw error;
+  }
+});
+
+router.get('/:id', checkGetProjectPermissions, async (req, res) => {
+  try {
+    const project = await getProjectById(req.params.id, req.tenantId);
+    return sendSuccessResponse(res, {
+      statusCode: STATUS_CODES.OK,
+      message: 'Project fetched successfully',
+      data: project,
+      path: req.originalUrl,
+    });
+  } catch (error) {
+    throw error;
+  }
+});
+
+router.get('/:id/tasks', checkGetProjectPermissions, async (req, res) => {
+  try {
+    const tasks = await getTasksByProject(req.params.id, req.tenantId);
+    return sendSuccessResponse(res, {
+      statusCode: STATUS_CODES.OK,
+      message: 'Tasks fetched successfully',
+      data: tasks,
       path: req.originalUrl,
     });
   } catch (error) {

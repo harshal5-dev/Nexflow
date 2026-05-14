@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
+import tenantPlugin from '../../common/tenantPlugin.js';
 
 const TaskSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true },
-    description: { type: String },
+    title: { type: String, required: true, maxLength: 250 },
+    description: { type: String, maxLength: 500 },
     status: {
       type: String,
       enum: [
@@ -34,5 +35,7 @@ const TaskSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+TaskSchema.plugin(tenantPlugin);
 
 export default mongoose.model('Task', TaskSchema);
