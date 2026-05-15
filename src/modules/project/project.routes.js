@@ -20,6 +20,11 @@ import {
   checkUpdateProjectPermissions,
   validateManageProject,
 } from './project.middleware.js';
+import {
+  checkCreateTaskPermission,
+  validateManageTask,
+} from '../task/task.middleware.js';
+import { createTask } from '../task/task.service.js';
 
 const router = express.Router();
 
@@ -148,5 +153,25 @@ router.get('/:id/tasks', checkGetProjectPermissions, async (req, res) => {
     throw error;
   }
 });
+
+router.post(
+  '/:id/tasks',
+  checkCreateTaskPermission,
+  validateManageTask,
+  async (req, res) => {
+    try {
+      req.body.project = req.params.id;
+      const task = await createTask(req.body);
+      return sendSuccessResponse(res, {
+        statusCode: STATUS_CODES.CREATED,
+        message: 'Task created successfully',
+        data: task,
+        path: req.originalUrl,
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+);
 
 export default router;

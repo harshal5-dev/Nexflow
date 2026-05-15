@@ -16,7 +16,14 @@ const createTask = async taskData => {
 
 const getTaskByProjectId = async (projectId, tenantId) => {
   try {
-    const tasks = await taskModel.find({ projectId }).setOptions({ tenantId });
+    const tasks = await taskModel
+      .find({ project: projectId })
+      .setOptions({ tenantId })
+      .populate({
+        path: 'assignedTo',
+        select: ['_id', 'firstName', 'lastName', 'emailId'],
+        options: { tenantId },
+      });
     return tasks.map(task =>
       filterResponseBody(task.toObject(), TASK_BY_PROJECT_ID_RESPONSE_FIELDS)
     );
@@ -25,4 +32,50 @@ const getTaskByProjectId = async (projectId, tenantId) => {
   }
 };
 
-export { createTask, getTaskByProjectId };
+const countTasksByProjectId = async (projectId, tenantId) => {
+  try {
+    const count = await taskModel
+      .countDocuments({
+        project: projectId,
+      })
+      .setOptions({ tenantId });
+    return count;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getTaskCountByProject = async tenantId => {
+  const taskCounts = await taskModel.aggregate([
+    {
+      $match: {
+        tenantId,
+      },
+    },
+    {
+      $unwind: '$project',
+    },
+    {
+      $group: {
+        _id: '$project',
+        taskCount: {
+          $sum: 1,
+        },
+      },
+    },
+  ]);
+  const countMap = new Map();
+
+  taskCounts.forEach(taskCount => {
+    countMap.set(taskCount._id.toString(), taskCount.taskCount);
+  });
+
+  return countMap;
+};
+
+export {
+  createTask,
+  getTaskByProjectId,
+  countTasksByProjectId,
+  getTaskCountByProject,
+};

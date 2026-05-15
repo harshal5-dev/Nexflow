@@ -4,6 +4,7 @@ const MANAGE_TASK_ALLOWED_FIELDS = [
   'dueDate',
   'priority',
   'status',
+  'assignedTo',
 ];
 
 const TASK_BY_PROJECT_ID_RESPONSE_FIELDS = [
@@ -13,6 +14,8 @@ const TASK_BY_PROJECT_ID_RESPONSE_FIELDS = [
   'dueDate',
   'priority',
   'status',
+  'assignedTo',
+  'createdAt',
 ];
 
 export { MANAGE_TASK_ALLOWED_FIELDS, TASK_BY_PROJECT_ID_RESPONSE_FIELDS };

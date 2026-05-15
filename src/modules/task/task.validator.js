@@ -12,11 +12,10 @@ const manageTaskSchema = z.object({
       .trim()
       .max(500, { error: 'Description must be at most 500 characters long' })
   ),
-  status: z.string(),
+  status: z.string({ error: 'Status is required' }),
   dueDate: z.string({ error: 'Due date is required' }),
-  assignees: z
-    .array(z.string().trim())
-    .min(1, { error: 'At least one assignee is required' }),
+  priority: z.string({ error: 'Priority is required' }),
+  assignedTo: z.string({ error: 'Assigned to is required' }),
 });
 
 export { manageTaskSchema };

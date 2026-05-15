@@ -1,5 +1,9 @@
 import { filterResponseBody } from '../../common/utils.js';
-import { getTaskByProjectId } from '../task/task.service.js';
+import {
+  countTasksByProjectId,
+  getTaskByProjectId,
+  getTaskCountByProject,
+} from '../task/task.service.js';
 import { getProjectLookUpUsers } from '../user/user.service.js';
 import {
   GET_ALL_PROJECTS_RESPONSE_FIELDS,
@@ -36,15 +40,12 @@ const getAllProjects = async (userId, tenantId, userType) => {
       .find(filter)
       .setOptions({ tenantId })
       .populate({
-        path: 'tasks',
-        select: '_id name status',
-        options: { tenantId },
-      })
-      .populate({
         path: 'assignees',
         select: '_id firstName lastName emailId',
         options: { tenantId },
       });
+
+    const taskCounts = await getTaskCountByProject(tenantId);
 
     const projectList = projects.map(project => {
       const projectObj = filterResponseBody(
@@ -54,7 +55,7 @@ const getAllProjects = async (userId, tenantId, userType) => {
 
       return {
         ...projectObj,
-        taskCount: project.tasks.length,
+        taskCount: taskCounts.get(project._id.toString()) || 0,
         assigneeCount: project.assignees.length,
       };
     });
@@ -71,19 +72,23 @@ const getProjectById = async (projectId, tenantId) => {
       .findOne({ _id: projectId })
       .setOptions({ tenantId })
       .populate({
-        path: 'tasks',
-        select: '_id name status dueDate',
-        options: { tenantId },
-      })
-      .populate({
         path: 'assignees',
         select: '_id firstName lastName emailId',
         options: { tenantId },
       });
-    return filterResponseBody(
+
+    const taskCount = await countTasksByProjectId(projectId, tenantId);
+
+    const filteredProject = filterResponseBody(
       project.toObject(),
       GET_PROJECT_BY_ID_RESPONSE_FIELDS
     );
+
+    return {
+      ...filteredProject,
+      taskCount,
+      assigneeCount: project.assignees.length,
+    };
   } catch (error) {
     throw error;
   }

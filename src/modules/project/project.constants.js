@@ -29,6 +29,7 @@ const GET_PROJECT_BY_ID_RESPONSE_FIELDS = [
   'createdAt',
   'updatedAt',
   'updatedBy',
+  'taskCount',
 ];
 
 export {
